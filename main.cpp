@@ -15,20 +15,22 @@ int main()
 
 	try
 	{
-		const int rows = 15;
-		const int columns = 15;
+		const int rows = 20;
+		const int columns = 30;
 		DistanceGrid grid(rows, columns);
 
 		SideWinder sideWinder;
 		sideWinder.on(grid);
-		//BinaryTree b;
-		//b.on(grid);
+		//BinaryTree binaryTree;
+		//binaryTree.on(grid);
 
-		Cell* start = grid(0, 0);
+		Cell* start = grid(10, 10);
 
+		//grid.path_toDistance(grid(15, 20));
 		grid.to_s(start);
+		//cout << grid << endl;
 
-		grid.to_png(32);
+		grid.to_png(16);
 	}
 	catch (const std::exception& ex)
 	{

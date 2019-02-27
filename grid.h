@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include "Distances.h"
 #include "Cell.h"
 
 class Grid
@@ -21,7 +22,8 @@ public:
 	int size();
 	void each_row();
 	void each_cell(std::function<void(Cell&)>);
-	std::vector<Cell*> path_to(Cell& goal); // find path to root from given cell
+	std::vector<Cell*> path_to(Cell* goal); // find path to root from given cell
+	Distances path_toDistance(Cell* goal); // find path to root from given cell
 	Cell* operator()(const size_t rowIndex, const size_t columnIndex);
 	virtual std::string contents_of(Cell* cell, Cell* dist) const;
 	friend std::ostream& operator<< (std::ostream &out, const Grid & inGrid);

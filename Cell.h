@@ -1,5 +1,6 @@
 #include <map>
 #include <vector>
+#include <iostream>
 
 #pragma once
 class Cell
@@ -16,7 +17,6 @@ public:
 	std::map<Cell*, bool> links;
 	bool operator<(const Cell& obj) const;
 	std::vector<Cell> neighbors;
-	
 
 	void link(Cell* cell, bool bidi = true);
 	void unlink(Cell* cell, bool bidi = true);

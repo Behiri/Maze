@@ -1,4 +1,3 @@
-#include "Distances.h"
 #include "grid.h"
 #include "Cell.h"
 #include <cstdlib>
@@ -7,6 +6,8 @@
 #include <stdexcept>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
 #include "SFML/Graphics.hpp"
 
 
@@ -81,13 +82,49 @@ void Grid::each_cell(std::function<void(Cell&)> inFunc)
 			
 }
 
-std::vector<Cell*> Grid::path_to(Cell& goal)
+std::vector<Cell*> Grid::path_to(Cell* goal)
 {
-	Cell current = goal;
-	Distances dist(root);
-	auto cells = dist.getCells();
-	std::vector<Cell*> vec;
-	return vec;
+	Cell* current = goal;
+	Distances breadcrumbs(root);
+	std::vector<Cell*> path;
+	path.push_back(current);
+
+
+	while (current != root)
+	{
+		for (auto [neighbor, linked] : current->links)
+		{
+			if (breadcrumbs[neighbor] < breadcrumbs[current] && linked)
+			{
+				path.push_back(neighbor);
+				current = neighbor;
+				break;
+			}
+		}
+	}
+	return path;
+}
+
+Distances Grid::path_toDistance(Cell* goal)
+{
+	Cell* current = goal;
+	Distances breadcrumbs(root);
+	breadcrumbs.cells[current] = breadcrumbs[current];
+
+
+	while (current != root)
+	{
+		for (auto [neighbor, linked] : current->links)
+		{
+			if (breadcrumbs[neighbor] < breadcrumbs[current] && linked)
+			{
+				breadcrumbs.cells[neighbor] = breadcrumbs[neighbor];
+				current = neighbor;
+				break;
+			}
+		}
+	}
+	return breadcrumbs;
 }
 
 Cell* Grid::operator()(const size_t rowIndex, const size_t columnIndex)
@@ -222,7 +259,7 @@ void Grid::to_png(int cellSize = 10)
 	unsigned int img_width = cellSize * columns;
 	unsigned int img_height = cellSize * rows;
 
-	sf::RenderWindow window(sf::VideoMode(img_width + 1, img_height + 1), "SFML window");
+	sf::RenderWindow window(sf::VideoMode(img_width + 1, img_height + 1), "Maze");
 	sf::RectangleShape line(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
 	line.setFillColor(sf::Color::Red);
 	window.setFramerateLimit(60);
@@ -239,6 +276,15 @@ void Grid::to_png(int cellSize = 10)
 		}
 
 		window.clear();
+		for (int i = 0; i <= columns;i++)
+			for (int j = 0; j <= rows; j++)
+			{
+				line.setSize(sf::Vector2f(cellSize / 5.0, cellSize / 5.0));
+				line.setPosition(i * cellSize - cellSize / 5.0, j * cellSize);
+				window.draw(line);
+			}	
+		line.setSize(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
+
 		for (auto& n : grid) {
 			for (auto cell : n)
 			{
