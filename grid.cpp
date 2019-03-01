@@ -48,10 +48,22 @@ void Grid::configure_cells()
 {
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < columns; j++) {
-			if ((i - 1) >= 0)	 grid[i][j]->pNorth = grid[i - 1][j]; else grid[i][j]->pNorth = nullptr;
-			if (i + 1 < rows)	 grid[i][j]->pSouth = grid[i + 1][j]; else grid[i][j]->pSouth = nullptr;
-			if (j + 1 < columns) grid[i][j]->pEast  = grid[i][j + 1]; else grid[i][j]->pEast = nullptr;
-			if (j - 1 >= 0)		 grid[i][j]->pWest  = grid[i][j - 1]; else grid[i][j]->pWest = nullptr;
+
+			if ((i - 1) >= 0) 
+				grid[i][j]->pNorth = grid[i - 1][j];
+			else grid[i][j]->pNorth = nullptr;
+
+			if (i + 1 < rows) 
+				grid[i][j]->pSouth = grid[i + 1][j];
+			else grid[i][j]->pSouth = nullptr;
+
+			if (j + 1 < columns) 
+				grid[i][j]->pEast  = grid[i][j + 1];
+			else grid[i][j]->pEast = nullptr;
+
+			if (j - 1 >= 0)		
+				grid[i][j]->pWest  = grid[i][j - 1]; 
+			else grid[i][j]->pWest = nullptr;
 		}
 	//std::cout << "Grid cells configured!\n";
 }
@@ -79,7 +91,6 @@ void Grid::each_cell(std::function<void(Cell&)> inFunc)
 	for (auto& row : grid)
 		for (auto& cell : row)
 			inFunc(*cell);
-			
 }
 
 std::vector<Cell*> Grid::path_to(Cell* goal)
@@ -88,7 +99,6 @@ std::vector<Cell*> Grid::path_to(Cell* goal)
 	Distances breadcrumbs(root);
 	std::vector<Cell*> path;
 	path.push_back(current);
-
 
 	while (current != root)
 	{

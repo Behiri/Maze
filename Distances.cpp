@@ -1,11 +1,11 @@
 #include "Distances.h"
+#include "Cell.h"
 
 Distances::Distances(Cell* cell)
 	: root(cell)
 {
 	cells[root] = 0;
 }
-
 
 Distances::~Distances()
 {

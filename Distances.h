@@ -1,11 +1,12 @@
 #pragma once
 #include <map>
-#include "Cell.h"
+
+class Cell;
 
 class Distances
 {
 public:
-	Distances(Cell* cell);
+	Distances(Cell* cell = nullptr);
 	~Distances();
 
 	Cell* root; // start point

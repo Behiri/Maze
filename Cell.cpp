@@ -1,6 +1,5 @@
 #include <iostream>
 #include "cell.h"
-#include "Distances.h"
 
 Cell::Cell(int row, int column)
 	: nRow (row)
@@ -52,31 +51,3 @@ bool Cell::isLinked(Cell* cell)
 		return false; // not found
 }
 
-int Cell::calcDist(Cell* c)
-{
-	Distances dist(this);
-	std::vector<Cell*> frontier;
-	frontier.push_back(this);
-
-	while (frontier.size() != 0)
-	{
-		std::vector<Cell*> new_frontier;
-
-
-		for (auto cell : frontier)
-		{
-			for (auto [adj, linked] : cell->links)
-			{
-				if (dist[adj] != -1)
-					continue;
-				dist.setDistance(adj, dist[cell] + 1);
-				new_frontier.push_back(adj);
-			}
-			
-		}
-		frontier = new_frontier;
-	}
-
-
-	return dist[c];
-}

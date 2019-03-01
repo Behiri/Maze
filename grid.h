@@ -15,7 +15,6 @@ public:
 	std::vector<std::vector<Cell*>> grid;
 	Cell* root;
 
-
 	void prepare_grid();
 	void configure_cells();
 	Cell* Random_Cell();

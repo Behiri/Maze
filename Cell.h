@@ -1,8 +1,9 @@
+#pragma once
 #include <map>
 #include <vector>
 #include <iostream>
+#include "Distances.h"
 
-#pragma once
 class Cell
 {
 public:
@@ -22,6 +23,5 @@ public:
 	void unlink(Cell* cell, bool bidi = true);
 	friend std::ostream& operator<<(std::ostream& stream, Cell& cell);
 	bool isLinked(Cell* cell);
-	int calcDist(Cell* c);
 };
 
