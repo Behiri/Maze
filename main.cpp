@@ -15,8 +15,8 @@ int main()
 
 	try
 	{
-		const int rows = 12;
-		const int columns = 12;
+		const int rows = 16;
+		const int columns = 16;
 		DistanceGrid grid(rows, columns);
 
 		SideWinder sideWinder;
@@ -24,12 +24,13 @@ int main()
 		//BinaryTree binaryTree;
 		//binaryTree.on(grid);
 
-		Cell* start = grid(0, 0);
+		Cell* start = grid(rows/2, columns /2);
+		Cell* end = grid(rows - 1, columns - 1);
+		
 		grid.initDistances(start);
-
-		//grid.path_toDistance(grid(15, 20));
-		grid.to_s(start);
-		//cout << grid << endl;
+		//grid.path_to(end);
+		//grid.to_s(start);
+		cout << grid << endl;
 
 		grid.to_png(16);
 	}

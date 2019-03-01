@@ -1,7 +1,6 @@
 #include "DistanceGrid.h"
 #include <string>
 #include <ctime>
-#include <memory>
 #include "helper.h"
 
 DistanceGrid::DistanceGrid()
@@ -26,7 +25,7 @@ Cell* DistanceGrid::operator()(int row, int col)
 std::string DistanceGrid::contents_of(Cell* cell = nullptr, Cell* dis = nullptr) const
 {
 	std::string out{};
-	if ((distances->cells).count(cell) == 1) return "   ";
+	if ((distances->cells).count(cell) != 1) return "   ";
 	int s = distances->cells.at(cell);
 	int offset = GetNumberOfDigits(s);
 	out.append(3 - offset, ' ');
@@ -62,6 +61,32 @@ std::unique_ptr<Distances> DistanceGrid::calcDist(Cell * root)
 	}
 	return dist;
 }
+
+
+std::unique_ptr<Distances>  DistanceGrid::path_to(Cell* goal)
+{
+	Cell* current = goal;
+	auto breadcrumbs = std::make_unique<Distances>(root);
+	breadcrumbs->cells[current] = distances->cells[current];
+
+
+	while (current != root)
+	{
+		for (auto [neighbor, linked] : current->links)
+		{
+			if (distances->cells[neighbor] < distances->cells[current] && linked)
+			{
+				breadcrumbs->cells[neighbor] = distances->cells[neighbor];
+				current = neighbor;
+				break;
+			}
+		}
+	}
+
+	distances = std::move(breadcrumbs);
+	return breadcrumbs;
+}
+
 
 DistanceGrid::~DistanceGrid()
 {

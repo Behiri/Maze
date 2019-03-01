@@ -17,5 +17,6 @@ public:
 	Cell* operator()(int row, int col);
 	std::string contents_of(Cell* cell, Cell* dis) const override;
 	std::unique_ptr<Distances> calcDist(Cell* root);
+	std::unique_ptr<Distances> path_to(Cell* goal);
 };
 
