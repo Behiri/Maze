@@ -12,9 +12,9 @@ DistanceGrid::DistanceGrid(int row, int col)
 {
 }
 
-void DistanceGrid::initDistances(Cell* root)
+void DistanceGrid::CalcDistancesFrom(Cell* root)
 {
-	distances = calcDist(root);
+	distances = std::move(calcDist(root));
 }
 
 Cell* DistanceGrid::operator()(int row, int col)
@@ -25,15 +25,28 @@ Cell* DistanceGrid::operator()(int row, int col)
 std::string DistanceGrid::contents_of(Cell* cell = nullptr, Cell* dis = nullptr) const
 {
 	std::string out{};
-	if ((distances->cells).count(cell) != 1) return "   ";
-	int s = distances->cells.at(cell);
+	if ((distances->cellDistances).count(cell) != 1) return "   ";
+	int s = distances->cellDistances.at(cell);
 	int offset = GetNumberOfDigits(s);
-	out.append(3 - offset, ' ');
-	out.append(std::to_string(s));
+	if (offset == 1) // if we have 1 digit just print it in center of cell
+	{
+		out.append(" ");
+		out.append(std::to_string(s));
+		out.append(" ");
+	}
+	else if (offset > 3) // if we have more than 3 digits it can't fit cell
+	{
+		out.append(" ? ");
+	}
+	else
+	{
+		out.append(3 - offset, ' ');
+		out.append(std::to_string(s));
+	}
 	return out;
 }
 
-std::unique_ptr<Distances> DistanceGrid::calcDist(Cell * root)
+std::unique_ptr<Distances> DistanceGrid::calcDist(Cell* root)
 {
 	auto dist = std::make_unique<Distances>(root);
 
@@ -41,53 +54,46 @@ std::unique_ptr<Distances> DistanceGrid::calcDist(Cell * root)
 	frontier.push_back(root);
 	dist->setDistance(root, 0);
 
-			while (frontier.size() != 0)
-			{
-				// when frontier ends this will be new frontier
-				std::vector<Cell*> new_frontier; 
+	while (frontier.size() != 0)
+	{
+		// when frontier ends this will be new frontier
+		std::vector<Cell*> new_frontier;
 
-				for (auto cell : frontier)
-				{
-					for (auto [adj, linked] : cell->links)
-					{
-						if (dist->cells[adj] != NULL || adj == root) 
-							continue;
-						dist->setDistance(adj, dist->cells[cell] + 1);
-						new_frontier.push_back(adj);
-					}
-				}
-				frontier = new_frontier;
-		
+		for (auto cell : frontier)
+		{
+			for (auto& [adj, linked] : cell->links)
+			{
+				if (dist->cellDistances[adj] != NULL || adj == root)
+					continue;
+				dist->setDistance(adj, dist->cellDistances[cell] + 1);
+				new_frontier.push_back(adj);
+			}
+		}
+		frontier = new_frontier;
 	}
 	return dist;
 }
 
-
-std::unique_ptr<Distances>  DistanceGrid::path_to(Cell* goal)
+std::unique_ptr<Distances> DistanceGrid::path_to(Cell* goal)
 {
 	Cell* current = goal;
-	auto breadcrumbs = std::make_unique<Distances>(root);
-	breadcrumbs->cells[current] = distances->cells[current];
-
+	//! path renamed from breadcrumbs
+	auto path = std::make_unique<Distances>(root);
+	path->cellDistances[current] = distances->cellDistances[current];
 
 	while (current != root)
 	{
-		for (auto [neighbor, linked] : current->links)
+		for (auto& [neighbor, linked] : current->links)
 		{
-			if (distances->cells[neighbor] < distances->cells[current] && linked)
+			if (distances->cellDistances[neighbor] < distances->cellDistances[current] && linked)
 			{
-				breadcrumbs->cells[neighbor] = distances->cells[neighbor];
+				path->cellDistances[neighbor] = distances->cellDistances[neighbor];
 				current = neighbor;
 				break;
 			}
 		}
 	}
 
-	distances = std::move(breadcrumbs);
-	return breadcrumbs;
-}
-
-
-DistanceGrid::~DistanceGrid()
-{
+	distances = std::move(path);
+	return path;
 }

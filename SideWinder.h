@@ -1,5 +1,5 @@
 #pragma once
-#include "grid.h"
+#include "Grid.h"
 #include "Cell.h"
 #include <vector>
 #include <random>
@@ -7,7 +7,7 @@
 class SideWinder
 {
 public:
-	void on(Grid& inGrid)
+	void on1(Grid& inGrid)
 	{
 		inGrid.each_cell([](Cell& cell) {
 			std::vector<Cell*> run;
@@ -34,16 +34,16 @@ public:
 				if (cell.pEast)
 					cell.link(cell.pEast);
 			}
-		});
+			});
 	}
 
-	void on1(Grid& inGrid)
+	void on(Grid& inGrid)
 	{
-		for(auto& row : inGrid.grid)
+		for (auto& row : inGrid.grid)
 		{
 			std::vector<Cell*> run;
 
-			for(auto cell : row) {
+			for (auto cell : row) {
 				run.push_back(cell);
 
 				bool headOrTail = std::rand() % 2; // 0 : head == curve south

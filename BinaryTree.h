@@ -1,5 +1,5 @@
 #pragma once
-#include "grid.h"
+#include "Grid.h"
 
 class BinaryTree
 {
@@ -27,7 +27,7 @@ public:
 			{
 				headOrTail ? cell.link(cell.pSouth) : cell.link(cell.pEast);
 			}
-		});
+			});
 	}
 
 	void on2(Grid& g)
@@ -37,9 +37,8 @@ public:
 
 		for (int i = 0; i < ROWS; i++)
 			for (int j = 0; j < COLUMNS; j++) {
-
 				bool leftOrDown = std::rand() % 2;
-				Cell *m = g.grid[i][j];
+				Cell* m = g.grid[i][j];
 
 				if (i == ROWS - 1 && j == COLUMNS - 1)
 					continue;
@@ -58,7 +57,6 @@ public:
 					continue;
 				}
 
-
 				if (leftOrDown == 0)
 				{
 					m->link(g.grid[i + 1][j], true);
@@ -75,7 +73,6 @@ public:
 		for (auto& row : inGrid.grid)
 		{
 			for (auto& cell : row) {
-
 				bool headOrTail = std::rand() % 2; // 0 : head == curve south
 
 				bool at_eastern_boundary = (cell->pEast == nullptr);
@@ -86,19 +83,16 @@ public:
 					if (cell->pSouth)
 						cell->link(cell->pSouth);
 				}
-				else if(at_southern_boundary)
+				else if (at_southern_boundary)
 				{
 					if (cell->pEast)
 						cell->link(cell->pEast);
 				}
-				else 
+				else
 				{
 					headOrTail ? cell->link(cell->pSouth) : cell->link(cell->pEast);
 				}
-				
-
 			}
-
 		}
 	}
 };

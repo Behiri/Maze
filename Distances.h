@@ -11,7 +11,9 @@ public:
 
 	Cell* root; // start point
 	void setDistance(Cell* cell, int dist);
-	std::map<Cell*, int> cells;
+	std::map<Cell*, int> cellDistances;
 	const int operator[](Cell* cell);
 	std::map<Cell*, int> getCells();
+	// Returns Farthest Cell from root and its Distance
+	std::pair<Cell*, int> LongestPath(Cell* root);
 };

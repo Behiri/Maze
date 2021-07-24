@@ -2,12 +2,12 @@
 #include "cell.h"
 
 Cell::Cell(int row, int column)
-	: nRow (row)
-	, nColumn (column)
+	: nRow(row)
+	, nColumn(column)
 {
 }
 
-bool Cell::operator<(const Cell & obj) const
+bool Cell::operator<(const Cell& obj) const
 {
 	if (obj.nRow < this->nRow)
 		return false;
@@ -30,7 +30,7 @@ void Cell::unlink(Cell* cell, bool bidi)
 	//return cell;
 }
 
-std::ostream & operator<<(std::ostream & stream, Cell & cell)
+std::ostream& operator<<(std::ostream& stream, Cell& cell)
 {
 	stream << "the cell nRow: " << cell.nRow << " nColumn: " << cell.nColumn << std::endl;
 	return stream;
@@ -41,7 +41,7 @@ bool Cell::isLinked(Cell* cell)
 	if (cell == nullptr)
 	{
 		return false;
-		std::cout << "Out Of Bounds Check! this cell Row: " << this->nRow 
+		std::cout << "Out Of Bounds Check! this cell Row: " << this->nRow
 			<< " Column: " << this->nColumn << std::endl;
 	}
 	//if (links.find(cell) != links.end())
@@ -51,3 +51,9 @@ bool Cell::isLinked(Cell* cell)
 		return false; // not found
 }
 
+Cell* Cell::GetRandomNeighbor()
+{
+	int size = std::size(neighbors);
+	int randomIndex = std::rand() % size;
+	return neighbors[randomIndex];
+}

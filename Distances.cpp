@@ -4,7 +4,7 @@
 Distances::Distances(Cell* cell)
 	: root(cell)
 {
-	cells[root] = 0;
+	cellDistances[root] = 0;
 }
 
 Distances::~Distances()
@@ -13,18 +13,35 @@ Distances::~Distances()
 
 void Distances::setDistance(Cell* cell, int dist)
 {
-	cells[cell] = dist;
+	cell->distance = dist;
+	cellDistances[cell] = dist;
 }
 
 const int Distances::operator[](Cell* cell)
 {
-	if (cells.count(cell) == 0)
+	if (cellDistances.count(cell) == 0)
 		return -1;
 
-	return cells[cell];
+	return cellDistances[cell];
 }
 
 std::map<Cell*, int> Distances::getCells()
 {
-	return cells;
+	return cellDistances;
+}
+
+std::pair<Cell*, int> Distances::LongestPath(Cell* root)
+{
+	int maxDist = 0;
+	Cell* maxCell = root;
+	for (auto& [cell, distance] : cellDistances)
+	{
+		if (distance > maxDist)
+		{
+			maxDist = distance;
+			maxCell = cell;
+		}
+	}
+
+	return std::make_pair(maxCell, maxDist);
 }

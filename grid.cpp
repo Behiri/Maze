@@ -1,4 +1,4 @@
-#include "grid.h"
+#include "Grid.h"
 #include "Cell.h"
 #include <cstdlib>
 #include <ctime>
@@ -8,8 +8,6 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include "SFML/Graphics.hpp"
-
 
 Grid::Grid(int rows, int columns) :
 	rows(rows),
@@ -21,9 +19,9 @@ Grid::Grid(int rows, int columns) :
 	root = grid[0][0];
 }
 
-Grid::Grid()
+Grid::Grid() :
+	Grid(3, 3)
 {
-
 }
 
 void Grid::prepare_grid()
@@ -38,7 +36,6 @@ void Grid::prepare_grid()
 		for (int j = 0; j < col; j++)
 		{
 			grid[i][j] = new Cell(i, j);
-
 		}
 	}
 	//std::cout << "Grid prepared!\n";
@@ -48,21 +45,32 @@ void Grid::configure_cells()
 {
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < columns; j++) {
-
-			if ((i - 1) >= 0) 
+			if ((i - 1) >= 0)
+			{
 				grid[i][j]->pNorth = grid[i - 1][j];
+				grid[i][j]->neighbors.push_back(grid[i][j]->pNorth);
+			}
 			else grid[i][j]->pNorth = nullptr;
 
-			if (i + 1 < rows) 
+			if (i + 1 < rows)
+			{
 				grid[i][j]->pSouth = grid[i + 1][j];
+				grid[i][j]->neighbors.push_back(grid[i][j]->pSouth);
+			}
 			else grid[i][j]->pSouth = nullptr;
 
-			if (j + 1 < columns) 
-				grid[i][j]->pEast  = grid[i][j + 1];
+			if (j + 1 < columns)
+			{
+				grid[i][j]->pEast = grid[i][j + 1];
+				grid[i][j]->neighbors.push_back(grid[i][j]->pEast);
+			}
 			else grid[i][j]->pEast = nullptr;
 
-			if (j - 1 >= 0)		
-				grid[i][j]->pWest  = grid[i][j - 1]; 
+			if (j - 1 >= 0)
+			{
+				grid[i][j]->pWest = grid[i][j - 1];
+				grid[i][j]->neighbors.push_back(grid[i][j]->pWest);
+			}
 			else grid[i][j]->pWest = nullptr;
 		}
 	//std::cout << "Grid cells configured!\n";
@@ -83,7 +91,6 @@ int Grid::size()
 
 void Grid::each_row()
 {
-	
 }
 
 void Grid::each_cell(std::function<void(Cell&)> inFunc)
@@ -106,13 +113,17 @@ Cell* Grid::operator()(const size_t rowIndex, const size_t columnIndex)
 	return grid[rowIndex][columnIndex];
 }
 
-
 std::string Grid::contents_of(Cell* root = nullptr, Cell* dist = nullptr) const
 {
 	return "   ";
 }
 
-std::ostream & operator<<(std::ostream & out, const Grid & inGrid)
+sf::Color Grid::Background_color_for(Cell* cell)
+{
+	return sf::Color::Yellow;
+}
+
+std::ostream& operator<<(std::ostream& out, const Grid& inGrid)
 {
 	std::string output = "";
 	bool top = true;
@@ -149,7 +160,6 @@ std::ostream & operator<<(std::ostream & out, const Grid & inGrid)
 		}
 
 		output.append("\n");
-
 	}
 
 	output.append("+");
@@ -190,23 +200,17 @@ void Grid::to_s(Cell* root)
 		for (auto cell : eachRow)
 		{
 			if (!cell->isLinked(cell->pEast)) {
-			
 				output.append(contents_of(cell));
 				output.append("|");
 			}
 			else
 			{
-// 				auto s = root->calcDist(cell);
-// 				int offset = GetNumberOfDigits(s);
-// 				output.append(3 - offset, ' ');
-// 				output.append(std::to_string(s));
 				output.append(contents_of(cell));
 				output.append(" ");
 			}
 		}
 
 		output.append("\n");
-
 	}
 
 	output.append("+");
@@ -227,28 +231,36 @@ void Grid::to_png(int cellSize = 10)
 
 	sf::RenderWindow window(sf::VideoMode(img_width + 1, img_height + 1), "Maze");
 	sf::RectangleShape line(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
-	line.setFillColor(sf::Color::Magenta);
-	window.setFramerateLimit(60);
-	
+	sf::RectangleShape background(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize)));
+	line.setFillColor(sf::Color::Black);
+	background.setFillColor(sf::Color::Black);
+	window.setFramerateLimit(1);
 
 	while (window.isOpen())
 	{
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
 
 		window.clear(sf::Color::Black);
-		for (int i = 0; i <= columns;i++)
-			for (int j = 0; j <= rows; j++)
+		/// Draw background with color and walls
+		for (int i = 0; i < columns; i++)
+			for (int j = 0; j < rows; j++)
 			{
+				//printf("i = %d , j = %d \n", i,j);
+				Cell* cell = grid[j][i];
+				sf::Color bgColor = Background_color_for(cell);
+				background.setFillColor(bgColor);
+				background.setPosition(i * cellSize, j * cellSize);
+				window.draw(background);
+
 				line.setSize(sf::Vector2f(cellSize / 5.0, cellSize / 5.0));
 				line.setPosition(i * cellSize - cellSize / 5.0, j * cellSize);
 				window.draw(line);
-			}	
+			}
 		line.setSize(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
 
 		for (auto& n : grid) {
@@ -314,5 +326,126 @@ void Grid::to_png(int cellSize = 10)
 		}
 		window.display();
 	}
-	//return EXIT_SUCCESS;
+}
+
+void Grid::to_png_Animated(int cellSize = 10)
+{
+	static int frameCount = 0;
+	static int currentDistanceDraw = 0;
+
+	unsigned int img_width = cellSize * columns;
+	unsigned int img_height = cellSize * rows;
+
+	sf::RenderWindow window(sf::VideoMode(img_width + 1, img_height + 1), "Maze");
+	sf::RectangleShape line(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
+	sf::RectangleShape background(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize)));
+	line.setFillColor(sf::Color::Black);
+	background.setFillColor(sf::Color::Green);
+	window.setFramerateLimit(30);
+
+	while (window.isOpen())
+	{
+		frameCount++;
+
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear(sf::Color::Black);
+		/// Draw background with color and walls
+		for (int i = 0; i < columns; i++)
+			for (int j = 0; j < rows; j++)
+			{
+				Cell* cell = grid[j][i];
+
+				if (cell->distance <= currentDistanceDraw)
+				{
+					sf::Color bgColor = Background_color_for(cell);
+					background.setFillColor(bgColor);
+					background.setPosition(i * cellSize, j * cellSize);
+					window.draw(background);
+				}
+
+				line.setSize(sf::Vector2f(cellSize / 5.0, cellSize / 5.0));
+				line.setPosition(i * cellSize - cellSize / 5.0, j * cellSize);
+				window.draw(line);
+			}
+
+		//if (frameCount % 2 == 0)
+		{
+			currentDistanceDraw++;
+			if (currentDistanceDraw > maximumDistance + 30)
+			{
+				currentDistanceDraw = 0;
+			}
+		}
+
+		line.setSize(sf::Vector2f(static_cast<float>(cellSize), static_cast<float>(cellSize) / 5.f));
+
+		for (auto& n : grid) {
+			for (auto cell : n)
+			{
+				float x1 = static_cast<float>(cell->nColumn * cellSize);
+				float y1 = static_cast<float>(cell->nRow * cellSize);
+				float x2 = static_cast<float>((cell->nColumn + 1) * cellSize);
+				float y2 = static_cast<float>((cell->nRow + 1) * cellSize);
+
+				if (cell->pSouth != nullptr && !cell->isLinked(cell->pSouth))
+				{
+					line.setPosition(x1, y2);
+					window.draw(line);
+				}
+				else if (cell->pSouth == nullptr)
+				{
+					line.setPosition(x1, y2);
+					window.draw(line);
+				}
+
+				if (cell->pEast != nullptr && !cell->isLinked(cell->pEast))
+				{
+					line.setPosition(x2, y1);
+					line.setRotation(90.f);
+					window.draw(line);
+					line.setRotation(0.f);
+				}
+				else if (cell->pEast == nullptr)
+				{
+					line.setPosition(x2, y1);
+					line.setRotation(90.f);
+					window.draw(line);
+					line.setRotation(0.f);
+				}
+				if (cell->pNorth != nullptr && !cell->isLinked(cell->pNorth))
+				{
+					line.setPosition(x1, y1);
+					window.draw(line);
+				}
+				else if (cell->pNorth == nullptr)
+				{
+					line.setPosition(x1, y1);
+					window.draw(line);
+				}
+
+				if (cell->pWest != nullptr && !cell->isLinked(cell->pWest))
+				{
+					line.setPosition(x1, y1);
+					line.setRotation(90.f);
+					window.draw(line);
+
+					line.setRotation(0.f);
+				}
+				else if (cell->pWest == nullptr)
+				{
+					line.setPosition(x1 + 3, y1);
+					line.setRotation(90.f);
+					window.draw(line);
+					line.setRotation(0.f);
+				}
+			}
+		}
+		window.display();
+	}
 }
